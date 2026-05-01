@@ -153,5 +153,122 @@ scenarios = [
             "right_clear": False,
             "sensor_valid": True
         }
+    },
+    {
+        "name": "Caution Obstacle, No Safe Side",
+        "inputs": {
+            "obstacle_distance_m": 1.5,
+            "lane_offset_m": 0.0,
+            "heading_error_deg": 0.0,
+            "speed_mps": 2.5,
+            "e_stop": False,
+            "left_clear": False,
+            "right_clear": False,
+            "sensor_valid": True
+        }
+    },
+    {
+        "name": "Caution Obstacle, Both Sides Clear, Centered",
+        "inputs": {
+            "obstacle_distance_m": 1.5,
+            "lane_offset_m": 0.0,
+            "heading_error_deg": 0.0,
+            "speed_mps": 1.5,
+            "e_stop": False,
+            "left_clear": True,
+            "right_clear": True,
+            "sensor_valid": True
+        }
+    },
+    {
+        "name": "Caution Obstacle, Both Sides Clear, Drifting Left",
+        "inputs": {
+            "obstacle_distance_m": 1.5,
+            "lane_offset_m": -0.2,
+            "heading_error_deg": -5.0,
+            "speed_mps": 1.5,
+            "e_stop": False,
+            "left_clear": True,
+            "right_clear": True,
+            "sensor_valid": True
+        }
+    },
+    {
+        "name": "Caution Obstacle, Both Sides Clear, Drifting Right",
+        "inputs": {
+            "obstacle_distance_m": 1.5,
+            "lane_offset_m": 0.2,
+            "heading_error_deg": 5.0,
+            "speed_mps": 1.5,
+            "e_stop": False,
+            "left_clear": True,
+            "right_clear": True,
+            "sensor_valid": True
+        }
+    },
+    {
+        "name": "Mild Drift Left, Normal Speed",
+        "inputs": {
+            "obstacle_distance_m": 999.0,
+            "lane_offset_m": -0.25,
+            "heading_error_deg": -5.0,
+            "speed_mps": 2.2,
+            "e_stop": False,
+            "left_clear": True,
+            "right_clear": True,
+            "sensor_valid": True
+        }
+    },
+    {
+        "name": "Large Drift Left, Normal Speed",
+        "inputs": {
+            "obstacle_distance_m": 999.0,
+            "lane_offset_m": -0.5,
+            "heading_error_deg": -20.0,
+            "speed_mps": 2.0,
+            "e_stop": False,
+            "left_clear": True,
+            "right_clear": True,
+            "sensor_valid": True
+        }
+    },
+    {
+        "name": "Clear Path, Centered, High Speed",
+        "inputs": {
+            "obstacle_distance_m": 999.0,
+            "lane_offset_m": 0.0,
+            "heading_error_deg": 0.0,
+            "speed_mps": 4.0,
+            "e_stop": False,
+            "left_clear": True,
+            "right_clear": True,
+            "sensor_valid": True
+        }
+    },
+    {
+        "name": "Mild Drift Left, High Speed",
+        "inputs": {
+            "obstacle_distance_m": 999.0,
+            "lane_offset_m": -0.25,
+            "heading_error_deg": -10.0,
+            "speed_mps": 4.0,
+            "e_stop": False,
+            "left_clear": True,
+            "right_clear": True,
+            "sensor_valid": True
+        }
+    },
+    {
+        "name": "Large Drift Left, High Speed",
+        "inputs": {
+            "obstacle_distance_m": 999.0,
+            "lane_offset_m": -0.5,
+            "heading_error_deg": -20.0,
+            "speed_mps": 4.0,
+            "e_stop": False,
+            "left_clear": True,
+            "right_clear": True,
+            "sensor_valid": True
+        }
     }
 ]

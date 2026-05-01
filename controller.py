@@ -86,15 +86,15 @@ def controller(
             speed_action = "SLOW"
 
         elif heading_error_deg > MILD_HEADING_DEG or lane_offset_m > MILD_OFFSET_M:
-            steering = "LEFT"
-            speed_action = "SLOW"
-
-        elif heading_error_deg < -MILD_HEADING_DEG or lane_offset_m < -MILD_OFFSET_M:
             steering = "RIGHT"
             speed_action = "SLOW"
 
+        elif heading_error_deg < -MILD_HEADING_DEG or lane_offset_m < -MILD_OFFSET_M:
+            steering = "LEFT"
+            speed_action = "SLOW"
+
         else:
-            steering = "STRAIGHT"
+            steering = "LEFT"
             speed_action = "SLOW"
 
     elif speed_mps >= HIGH_SPEED_MPS:
