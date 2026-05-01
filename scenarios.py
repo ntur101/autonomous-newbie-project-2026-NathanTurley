@@ -113,5 +113,45 @@ scenarios = [
             "right_clear": True,
             "sensor_valid": True
         }
+    },
+    ##Nathan added more scenarios
+    {
+        "name": "Close Obstacle Ahead, Both Sides safe",
+        "inputs": {
+            "obstacle_distance_m": 0.8,
+            "lane_offset_m": 0.0,
+            "heading_error_deg": 0.0,
+            "speed_mps": 2.5,
+            "e_stop": False,
+            "left_clear": True,
+            "right_clear": True,
+            "sensor_valid": True
+        }
+    },
+    {
+        "name": "Mild Drift at High Speed",
+        "inputs": {
+            "obstacle_distance_m": 999.0,
+            "lane_offset_m": 0.25,
+            "heading_error_deg": 10.0,
+            "speed_mps": 4.0,
+            "e_stop": False,
+            "left_clear": True,
+            "right_clear": True,
+            "sensor_valid": True
+        }
+    },
+    {
+        "name": "Large Error at Normal Speed",
+        "inputs": {
+            "obstacle_distance_m": 999.0,
+            "lane_offset_m": 0.5,
+            "heading_error_deg": 20.0,
+            "speed_mps": 2.0,
+            "e_stop": False,
+            "left_clear": False,
+            "right_clear": False,
+            "sensor_valid": True
+        }
     }
 ]
