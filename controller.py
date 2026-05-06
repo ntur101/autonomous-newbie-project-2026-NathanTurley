@@ -69,8 +69,21 @@ def controller(
         speed_action = "STOP"
 
     elif obstacle_distance_m <= DANGER_OBSTACLE_M:
-        steering = "STRAIGHT"
-        speed_action = "STOP"
+        if not left_clear and not right_clear:
+            steering = "STRAIGHT"
+            speed_action = "STOP"
+        elif left_clear and not right_clear:
+            steering = "LEFT"
+            speed_action = "SLOW"
+        elif right_clear and not left_clear:
+            steering = "RIGHT"
+            speed_action = "SLOW"
+        elif left_clear and right_clear and heading_error_deg == 0:
+            steering = "STRAIGHT"
+            speed_action = "STOP"
+        else:
+            steering = "LEFT"
+            speed_action = "SLOW"
 
     elif obstacle_distance_m <= CAUTION_OBSTACLE_M:
         if not left_clear and not right_clear:

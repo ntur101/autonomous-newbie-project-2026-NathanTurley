@@ -80,6 +80,7 @@ class VisualizerApp:
 
         self.command_steering = "STRAIGHT"
         self.command_speed_action = "SLOW"
+        self.live_inputs = None
 
         self.crashed = False
         self.crash_reason = ""
@@ -316,6 +317,36 @@ class VisualizerApp:
 
         return steering, speed_action
 
+    def compute_live_sensor_data(self):
+        scenario = self.current_scenario()
+        original_inputs = scenario["inputs"]
+
+        lane_offset_m = self.x_to_lane_offset_m(self.vehicle_x)
+        heading_error_deg = self.vehicle_heading_deg
+        speed_mps = self.vehicle_speed_mps
+
+        obstacle_distance_m = 999.0
+        if original_inputs["obstacle_distance_m"] < 999.0:
+            obstacle_rect = self.obstacle_rect_from_inputs(original_inputs)
+            if obstacle_rect is not None:
+                obstacle_cy = (obstacle_rect[1] + obstacle_rect[3]) / 2.0
+                pixel_gap = self.vehicle_y - obstacle_cy
+                if pixel_gap > 0:
+                    obstacle_distance_m = max(0.0, (pixel_gap - 16.0) / 88.0)
+                else:
+                    obstacle_distance_m = 999.0
+
+        return {
+            "obstacle_distance_m": obstacle_distance_m,
+            "lane_offset_m": lane_offset_m,
+            "heading_error_deg": heading_error_deg,
+            "speed_mps": speed_mps,
+            "e_stop": original_inputs["e_stop"],
+            "left_clear": original_inputs["left_clear"],
+            "right_clear": original_inputs["right_clear"],
+            "sensor_valid": original_inputs["sensor_valid"],
+        }
+
     def lane_offset_to_x(self, lane_offset_m):
         return ROAD_CENTER_X + lane_offset_m * PIXELS_PER_METER_X
 
@@ -466,6 +497,7 @@ class VisualizerApp:
         self.command_steering, self.command_speed_action = self.run_controller_for_current_scenario()
 
         self.frame_i = 0
+        self.live_inputs = None
 
         self.crashed = False
         self.crash_reason = ""
@@ -508,10 +540,7 @@ class VisualizerApp:
         self.reset_vehicle_state()
         self.animating = True
         self.status_label.config(
-            text=(
-                f"Animating controller output: "
-                f"{self.command_steering} + {self.command_speed_action}"
-            )
+            text="Animating (reactive mode)"
         )
         self.animate_step()
 
@@ -562,6 +591,18 @@ class VisualizerApp:
 
         dt = FRAME_DELAY_MS / 1000.0
         self.frame_i += 1
+
+        self.live_inputs = self.compute_live_sensor_data()
+        self.command_steering, self.command_speed_action = controller(
+            self.live_inputs["obstacle_distance_m"],
+            self.live_inputs["lane_offset_m"],
+            self.live_inputs["heading_error_deg"],
+            self.live_inputs["speed_mps"],
+            self.live_inputs["e_stop"],
+            self.live_inputs["left_clear"],
+            self.live_inputs["right_clear"],
+            self.live_inputs["sensor_valid"],
+        )
 
         heading_locked = abs(self.vehicle_heading_deg) >= 90.0
 
@@ -808,18 +849,27 @@ class VisualizerApp:
     def refresh_view(self):
         scenario = self.current_scenario()
         inputs = scenario["inputs"]
-        steering, speed_action = self.run_controller_for_current_scenario()
 
-        self.command_steering = steering
-        self.command_speed_action = speed_action
+        if self.animating and self.live_inputs is not None:
+            display_inputs = self.live_inputs
+            steering = self.command_steering
+            speed_action = self.command_speed_action
+        else:
+            steering, speed_action = self.run_controller_for_current_scenario()
+            self.command_steering = steering
+            self.command_speed_action = speed_action
+            display_inputs = inputs
 
         self.scenario_name_label.config(
             text=f"Scenario {self.index + 1}/{len(scenarios)}\n{scenario['name']}"
         )
 
         input_lines = []
-        for key, value in inputs.items():
-            input_lines.append(f"{key}: {value}")
+        for key, value in display_inputs.items():
+            if isinstance(value, float):
+                input_lines.append(f"{key}: {value:.2f}")
+            else:
+                input_lines.append(f"{key}: {value}")
         self.inputs_label.config(text="\n".join(input_lines))
 
         output_text = (
