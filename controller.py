@@ -61,17 +61,31 @@ def controller(
     steering = "STRAIGHT"
     speed_action = "ACCELERATE"
 
+    if e_stop:
+        return "STRAIGHT", "STOP"
+
     if not sensor_valid:
         return "STRAIGHT", "STOP"
 
-    if e_stop:
-        steering = "STRAIGHT"
-        speed_action = "STOP"
-
+    # If obstacle is within danger threshold
     elif obstacle_distance_m <= DANGER_OBSTACLE_M:
-        steering = "STRAIGHT"
-        speed_action = "STOP"
+        if not left_clear and not right_clear:
+            steering = "STRAIGHT"
+            speed_action = "STOP"
 
+        elif left_clear and not right_clear:
+            steering = "LEFT"
+            speed_action = "STOP"
+
+        elif right_clear and not left_clear:
+            steering = "RIGHT"
+            speed_action = "STOP"
+
+        else:
+            steering = "STRAIGHT"
+            speed_action = "STOP"
+
+    # If obstacle is within caution threshold
     elif obstacle_distance_m <= CAUTION_OBSTACLE_M:
         if not left_clear and not right_clear:
             steering = "STRAIGHT"
@@ -85,35 +99,53 @@ def controller(
             steering = "RIGHT"
             speed_action = "SLOW"
 
+        # If drifting right
         elif heading_error_deg > MILD_HEADING_DEG or lane_offset_m > MILD_OFFSET_M:
+            steering = "LEFT"
+            speed_action = "SLOW"
+
+        # If drifting left
+        elif heading_error_deg < -MILD_HEADING_DEG or lane_offset_m < -MILD_OFFSET_M:
             steering = "RIGHT"
             speed_action = "SLOW"
 
-        elif heading_error_deg < -MILD_HEADING_DEG or lane_offset_m < -MILD_OFFSET_M:
-            steering = "LEFT"
-            speed_action = "SLOW"
-
         else:
-            steering = "LEFT"
+            steering = "STRAIGHT"
             speed_action = "SLOW"
 
+    # If speed is above high speed threshold
     elif speed_mps >= HIGH_SPEED_MPS:
+        # If drifting right
         if heading_error_deg > LARGE_HEADING_DEG or lane_offset_m > LARGE_OFFSET_M:
             steering = "LEFT"
             speed_action = "SLOW"
 
+        # If drifting left
         elif heading_error_deg < -LARGE_HEADING_DEG or lane_offset_m < -LARGE_OFFSET_M:
             steering = "RIGHT"
             speed_action = "SLOW"
 
+    # If large drift to the right
     elif heading_error_deg > LARGE_HEADING_DEG or lane_offset_m > LARGE_OFFSET_M:
+        steering = "LEFT"
+        speed_action = "SLOW"
+
+    # If large drift to the left
+    elif heading_error_deg < -LARGE_HEADING_DEG or lane_offset_m < -LARGE_OFFSET_M:
+        steering = "RIGHT"
+        speed_action = "SLOW"
+
+    # If mild drift to the right
+    elif heading_error_deg > MILD_HEADING_DEG or lane_offset_m > MILD_OFFSET_M:
         steering = "LEFT"
         speed_action = "ACCELERATE"
 
-    elif heading_error_deg < -LARGE_HEADING_DEG or lane_offset_m < -LARGE_OFFSET_M:
+    # If mild drift to the left
+    elif heading_error_deg < -MILD_HEADING_DEG or lane_offset_m < -MILD_OFFSET_M:
         steering = "RIGHT"
         speed_action = "ACCELERATE"
 
+    # If centered and small heading error (everything else is fine)
     elif centered and small_heading_error:
         steering = "STRAIGHT"
         speed_action = "ACCELERATE"
